@@ -44,14 +44,24 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       
+      
       - name: Build APK
         run: |
           cd "$PROJECT_DIR"
-          sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g' app/build.gradle.kts
+          cat >> app/build.gradle.kts <<'EOF'
+
+          android {
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+          }
+          EOF
           gradle :app:assembleDebug
           APK=$(find app/build/outputs/apk/debug -name '*.apk' -print -quit)
           test -n "$APK"
           cp "$APK" "$GITHUB_WORKSPACE/KamenRiderLegends-debug.apk"
+
           
           
           
